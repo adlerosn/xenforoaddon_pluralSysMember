@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addon addon_id="pluralSysMember" title="[kiror] Plural System Member bbCode" version_string="0.1" version_id="1" url="https://github.com/adlerosn/" install_callback_class="" install_callback_method="" uninstall_callback_class="" uninstall_callback_method="">
+  <admin_navigation/>
+  <admin_permissions/>
+  <admin_style_properties/>
+  <admin_templates/>
+  <admin_template_modifications/>
+  <code_events/>
+  <code_event_listeners/>
+  <cron/>
+  <email_templates/>
+  <email_template_modifications/>
+  <optiongroups/>
+  <permissions>
+    <permission_groups>
+      <permission_group permission_group_id="pluralsysgrp"/>
+    </permission_groups>
+    <permissions>
+      <permission permission_group_id="pluralsysgrp" permission_id="showbtnineditor" permission_type="flag" default_value="unset" interface_group_id="pluralsysiface" display_order="1"/>
+    </permissions>
+    <interface_groups>
+      <interface_group interface_group_id="pluralsysiface" display_order="1"/>
+    </interface_groups>
+  </permissions>
+  <phrases>
+    <phrase title="custom_bb_code_pluralsys_desc" version_id="0" version_string="0.0"><![CDATA[This will identify the member of the plural system that said those things.]]></phrase>
+    <phrase title="custom_bb_code_pluralsys_title" global_cache="1" version_id="0" version_string="0.0"><![CDATA[Plural system]]></phrase>
+    <phrase title="permission_group_pluralsysgrp" version_id="0" version_string="0.0"><![CDATA[[kiror] Plural system]]></phrase>
+    <phrase title="permission_interface_pluralsysiface" version_id="0" version_string="0.0"><![CDATA[[kiror] Plural system]]></phrase>
+    <phrase title="permission_pluralsysgrp_showbtnineditor" version_id="0" version_string="0.0"><![CDATA[Show plural system button in editor]]></phrase>
+  </phrases>
+  <route_prefixes/>
+  <style_properties/>
+  <templates>
+    <template title="editor_dialog_pluralsys" version_id="1" version_string="0.1"><![CDATA[<div>
+	<dl class="ctrlUnit">
+		<dt>Plural system member:</dt>
+		<dd><input type="text" name="redactor_pluralsys_text" id="redactor_pluralsys_text" class="textCtrl" autofocus></input></dd>
+	</dl>
+</div>
+
+<dl class="ctrlUnit submitUnit">
+	<dt></dt>
+	<dd>
+		<input type="button" name="redactor_insert_pluralsys_btn" class="redactor_modal_btn button primary" id="redactor_insert_pluralsys_btn" value="{xen:phrase insert}" />
+		<a href="javascript:void(null);" class="redactor_modal_btn redactor_btn_modal_close button">{xen:phrase cancel}</a>
+	</dd>
+</dd>]]></template>
+  </templates>
+  <public_template_modifications>
+    <modification template="editor_ui.css" modification_key="addicontowysiwygeditorbutton" description="Add icon to WYSIWYG editor button." execution_order="10" enabled="1" action="str_replace">
+      <find><![CDATA[/* DROPDOWN */]]></find>
+      <replace><![CDATA[html .redactor_toolbar li a.redactor_btn_pluralsys{
+background-image: url('styles/kiror/pluralSysMember/multiplicityAlpha.png');
+background-size: 16px 16px;
+background-repeat: no-repeat;
+background-position: 3px 3px;
+}
+
+$0]]></replace>
+    </modification>
+    <modification template="page_container_js_head" modification_key="addjstowysiwygeditorextension" description="Add js to WYSIWYG editor extension." execution_order="10" enabled="1" action="str_replace">
+      <find><![CDATA[<!--XenForo_Require:JS-->]]></find>
+      <replace><![CDATA[$0
+<script>
+<xen:if is="{$visitor.permissions.pluralsysgrp.showbtnineditor}">
+enablepluralsysPlugin = true;
+<xen:else />
+enablepluralsysPlugin = false;
+</xen:if>
+</script>
+<script src="{xen:helper javaScriptUrl, '{$javaScriptSource}/pluralSysMember/extend.js?_v={$xenOptions.jsVersion}'}"></script>]]></replace>
+    </modification>
+    <modification template="editor_js_setup" modification_key="addrelangbuttonjs" description="Add button label" execution_order="10" enabled="1" action="str_replace">
+      <find><![CDATA[RELANG.xf = {]]></find>
+      <replace><![CDATA[$0
+	pluralsys_title: "Plural System",]]></replace>
+    </modification>
+  </public_template_modifications>
+  <bb_code_media_sites/>
+  <bb_codes>
+    <bb_code bb_code_id="pluralsys" bb_code_mode="callback" has_option="optional" callback_class="pluralSysMember_sharedStatic" callback_method="bbrenderCallback" option_regex="" trim_lines_after="0" plain_children="0" disable_smilies="0" disable_nl2br="0" disable_autolink="0" allow_empty="1" allow_signature="1" editor_icon_url="" sprite_mode="1" active="1" sprite_params_x="0" sprite_params_y="20">
+      <replace_html><![CDATA[]]></replace_html>
+      <replace_html_email><![CDATA[]]></replace_html_email>
+      <replace_text><![CDATA[]]></replace_text>
+      <example><![CDATA[[PLURALSYS="First member from plural system"]Some text[/PLURALSYS]
+[PLURALSYS="Second member from plural system"]Another text[/PLURALSYS]
+[PLURALSYS="First member from plural system"]More text[/PLURALSYS]]]></example>
+    </bb_code>
+  </bb_codes>
+</addon>
