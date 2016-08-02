@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="pluralSysMember" title="[kiror] Plural System Member bbCode" version_string="0.1" version_id="1" url="https://github.com/adlerosn/" install_callback_class="" install_callback_method="" uninstall_callback_class="" uninstall_callback_method="">
+<addon addon_id="pluralSysMember" title="[kiror] Plural System Member bbCode" version_string="0.2" version_id="2" url="https://github.com/adlerosn/" install_callback_class="pluralSysMember_Install" install_callback_method="install" uninstall_callback_class="pluralSysMember_Install" uninstall_callback_method="uninstall">
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
   <admin_templates/>
   <admin_template_modifications/>
   <code_events/>
-  <code_event_listeners/>
+  <code_event_listeners>
+    <listener event_id="front_controller_pre_view" execute_order="10" callback_class="pluralSysMember_Listener_FrontControllerPreView" callback_method="callback" active="1" hint="" description="Add parameter to a template"/>
+    <listener event_id="load_class" execute_order="10" callback_class="pluralSysMember_Listener_LoadClassController" callback_method="callback" active="1" hint="XenForo_ControllerPublic_Account" description="Add subroute to edit system members."/>
+  </code_event_listeners>
   <cron/>
   <email_templates/>
   <email_template_modifications/>
@@ -32,10 +35,204 @@
   <route_prefixes/>
   <style_properties/>
   <templates>
-    <template title="editor_dialog_pluralsys" version_id="1" version_string="0.1"><![CDATA[<div>
+    <template title="account_pluralsystemmembers" version_id="2" version_string="0.2"><![CDATA[<xen:title>Plural System Members</xen:title>
+<xen:require css="account_pluralsystemmembers.css" />
+<script>
+<xen:include template="account_pluralsystemmembers.js" />
+</script>
+
+<form action="{xen:link 'account/system-members'}" method="post" class="xenForm AutoValidator"
+	data-optInOut="optIn"
+	data-redirect="true"
+	data-redirect="on">
+
+<table class="beatiful" style="max-width: 600px;">
+<tbody>
+	<tr class="beatiful">
+		<th class="beatiful alignCenter">Name</th>
+		<th class="beatiful alignCenter">Hue</th>
+		<th class="beatiful alignCenter">Delete?</th>
+	</tr>
+	<tr class="beautiful jsCloneMe">
+		<td class="beatiful alignCenter"><input type="text" placeholder="Name" value="" class="textCtrl" style="width: 90%;" ></td>
+		<td class="beatiful alignCenter"><input type="range" min="0" max="360" value="0" class="huePicker" style="background-color: hsl(0,100%,50%); box-shadow: hsl(0,100%,50%) 5px 0 5px , hsl(0,100%,50%) -5px 0 5px , hsl(0,100%,50%) 0 5px 5px , hsl(0,100%,50%) 0 -5px 5px ;"></td>
+		<td class="beatiful alignCenter"><a href="javascript:void(0);" class="button deletableRow">Delete!</a></td>
+	</tr>
+	<xen:foreach loop="$members" value="$member">
+	<tr class="beatiful">
+		<td class="beatiful alignCenter"><input name="member_nm_edit_{$member.member_id}" type="text" placeholder="Name" value="{$member.member_nm}" class="textCtrl" style="width: 90%;" required></td>
+		<td class="beatiful alignCenter"><input name="color_hue_edit_{$member.member_id}" type="range" min="0" max="360" value="{$member.color_hue}" class="huePicker" style="background-color: hsl({$member.color_hue},100%,50%); box-shadow: hsl({$member.color_hue},100%,50%) 5px 0 5px , hsl({$member.color_hue},100%,50%) -5px 0 5px , hsl({$member.color_hue},100%,50%) 0 5px 5px , hsl({$member.color_hue},100%,50%) 0 -5px 5px ;"></td>
+		<td class="beatiful alignCenter"><a href="javascript:void(0);" class="button deletableRow">Delete!</a></td>
+	</tr>
+	</xen:foreach>
+	<tr class="notsobeatiful">
+		<td class=""></td>
+		<td class=""></td>
+		<td class="beatiful alignCenter"><a href="javascript:void(0);" class="button addRow">Add</a></td>
+	</tr>
+</tbody>
+</table>
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd>
+			<input type="submit" value="{xen:phrase save_changes}" accesskey="s" class="button primary" />
+			<a href="{xen:link 'account/system-members'}" class="button" >{xen:phrase undo_changes}</a>
+		</dd>
+	</dl>
+</form>]]></template>
+    <template title="account_pluralsystemmembers.css" version_id="2" version_string="0.2"><![CDATA[table.beatiful {
+	width: 100%;
+}
+
+table.beatifulwithborder, th.beatiful, td.beatiful {
+	border: 1px solid {xen:property primaryDarker};
+}
+
+td.leftbeatiful {
+	border-left: 1px solid {xen:property primaryDarker};
+	padding-left: 5px;
+}
+td.rightbeatiful {
+	border-right: 1px solid {xen:property primaryDarker};
+	padding-right: 5px;
+}
+td.topbeatiful {
+	border-top: 1px solid {xen:property primaryDarker};
+	padding-top: 5px;
+}
+td.bottombeatiful {
+	border-bottom: 1px solid {xen:property primaryDarker};
+	padding-bottom: 5px;
+}
+
+th.beatiful, td.beatiful {
+	padding: 2px;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+tr.beatiful:nth-child(even) {
+	background-color: {xen:property primaryLightest};
+}
+
+tr.beatiful:nth-child(odd) {
+	background-color: {xen:property primaryLighterStill};
+}
+
+th.beatiful {
+	font-weight: bold;
+	background-color: {xen:property primaryMedium};
+	color: {xen:property primaryLightest};
+}
+
+td.beatiful input.huePicker {
+	margin: 10px;
+}
+
+.alignRight {
+	text-align: right;
+}
+.alignLeft {
+	text-align: left;
+}
+.alignCenter {
+	text-align: center;
+}
+.huePicker{
+	padding-right: 5px;
+	padding-left: 5px;
+}
+.beatiful tr:nth-child(2) {
+	display: none;
+}]]></template>
+    <template title="account_pluralsystemmembers.js" version_id="2" version_string="0.2"><![CDATA[pluralsystemmembers_addcount = 0;
+
+function pluralsystemmembers_bind(){
+    $(".huePicker").unbind();
+    $(".addRow").unbind();
+    $(".huePicker").bind("change keyup keydown input", function(){
+    	pluralsystemmembers_latestColor = 'hsl('+$(this)[0].value+',100%,50%)';
+    	$(this)[0].style.backgroundColor = pluralsystemmembers_latestColor;
+    	$(this)[0].style.boxShadow = (
+    	    pluralsystemmembers_latestColor+' 5px 0 5px,'+
+    	    pluralsystemmembers_latestColor+' 0 5px 5px,'+
+    	    pluralsystemmembers_latestColor+' -5px 0 5px,'+
+    	    pluralsystemmembers_latestColor+' 0 -5px 5px');
+    });
+    $(".addRow").click(function(){
+        var table = $("table.beatiful")[0];
+        var row = table.insertRow(table.rows.length-1);
+        var base = $(".jsCloneMe")[0].cloneNode(true);
+        var cn = base.childNodes;
+        var cn2 = null;
+        var i = 0;
+        var j = 0;
+        var k = 0;
+        var p = ['member_nm_new_','color_hue_new_'];
+        pluralsystemmembers_addcount++;
+        for(i=0;i<cn.length;i++){
+            if((cn[i].tagName)!='TD') continue;
+            else{
+                cn2 = cn[i].childNodes;
+            	for(k=0;k<cn2.length;k++){
+                    if((cn2[k].tagName)!='INPUT') continue;
+                    else{
+                        cn2[k].name=p[j]+pluralsystemmembers_addcount;
+                        j++;
+                        if(j>=2){
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        row.outerHTML = base.outerHTML;
+    	pluralsystemmembers_bind();
+    });
+    $(".deletableRow").click(function(){
+        var toDelete = $(this)[0].parentNode.parentNode;
+        var parentOfToDelete = toDelete.parentNode;
+        parentOfToDelete.removeChild(toDelete);
+    	pluralsystemmembers_bind();
+    });
+}
+
+function pluralsystemmembers_waitJQueryLoad(callable) {
+    if (window.jQuery) {
+        setTimeout(function(){callable();}, 100);
+        setTimeout(function(){callable();}, 300);
+        setTimeout(function(){callable();}, 500);
+        setTimeout(function(){callable();}, 1000);
+    }
+    else               setTimeout(function(){pluralsystemmembers_waitJQueryLoad(callable);}, 100);
+}
+
+pluralsystemmembers_waitJQueryLoad(pluralsystemmembers_bind);]]></template>
+    <template title="account_wrapperExtend_pluralsys" version_id="2" version_string="0.2"><![CDATA[<xen:if is="{$visitor.permissions.pluralsysgrp.showbtnineditor}">
+			<li class="section"><h4 class="subHeading">Plural System</h4>
+				<ul>
+					<li><a
+						class="{xen:if "{$selectedKey} == 'account/systemMembers'", 'secondaryContent', 'primaryContent'}"
+						href="{xen:link account/system-members}">{xen:phrase members}</a></li>
+				</ul>
+			</li>
+</xen:if>]]></template>
+    <template title="editor_dialog_pluralsys" version_id="2" version_string="0.2"><![CDATA[<script>
+<xen:include template="editor_dialog_pluralsys.js" />
+</script>
+<div>
 	<dl class="ctrlUnit">
 		<dt>Plural system member:</dt>
 		<dd><input type="text" name="redactor_pluralsys_text" id="redactor_pluralsys_text" class="textCtrl" autofocus></input></dd>
+	</dl>
+	<dl class="ctrlUnit">
+		<dt>Saved presets:</dt>
+		<dd>
+		<xen:foreach loop="$system_members" key="$k" value="$sysmem">
+			<a class="button" href='javascript:pluralsys_fill({$k});' style="margin-bottom:5px;">{$sysmem.member_nm}</a>
+		</xen:foreach>
+		</dd>
 	</dl>
 </div>
 
@@ -46,6 +243,26 @@
 		<a href="javascript:void(null);" class="redactor_modal_btn redactor_btn_modal_close button">{xen:phrase cancel}</a>
 	</dd>
 </dd>]]></template>
+    <template title="editor_dialog_pluralsys.js" version_id="2" version_string="0.2"><![CDATA[pluralsys_members = {xen:helper json, $system_members};
+
+function pluralsys_fill(index){
+	document.getElementById('redactor_pluralsys_text').value = (
+		'color_hue='+pluralsys_members[index]['color_hue']+';'+
+		pluralsys_members[index]['member_nm']
+	);
+	document.getElementById('redactor_insert_pluralsys_btn').click();
+}]]></template>
+    <template title="kiror_pluralSys_link1" version_id="2" version_string="0.2"><![CDATA[<xen:if is="{$visitor.permissions.pluralsysgrp.showbtnineditor}">
+		<dl class="ctrlUnit">
+			<dt><label>Plural System:</label></dt>
+			<dd>
+<a class="button" href="{xen:link account/system-members}" target="_blank">Edit Members</a>
+			</dd>
+		</dl>
+</xen:if>]]></template>
+    <template title="kiror_pluralSys_link2" version_id="2" version_string="0.2"><![CDATA[<xen:if is="{$visitor.permissions.pluralsysgrp.showbtnineditor}">
+<a href="{xen:link account/system-members}">Plural System Members</a>
+</xen:if>]]></template>
   </templates>
   <public_template_modifications>
     <modification template="editor_ui.css" modification_key="addicontowysiwygeditorbutton" description="Add icon to WYSIWYG editor button." execution_order="10" enabled="1" action="str_replace">
@@ -70,6 +287,21 @@ enablepluralsysPlugin = false;
 </xen:if>
 </script>
 <script src="{xen:helper javaScriptUrl, '{$javaScriptSource}/pluralSysMember/extend.js?_v={$xenOptions.jsVersion}'}"></script>]]></replace>
+    </modification>
+    <modification template="account_personal_details" modification_key="addlinktoeditpluralsystems" description="Add link to edit plural systems in profile editing" execution_order="10" enabled="1" action="str_replace">
+      <find><![CDATA[<xen:include template="custom_fields_edit" />]]></find>
+      <replace><![CDATA[$0
+		<xen:include template="kiror_pluralSys_link1" />]]></replace>
+    </modification>
+    <modification template="navigation_visitor_tab" modification_key="addlinktoeditpluralsystemsvistitortab" description="Add link to edit plural systems in visitor tab" execution_order="10" enabled="1" action="str_replace">
+      <find><![CDATA[<li><a href="{xen:link account/likes]]></find>
+      <replace><![CDATA[<xen:include template="kiror_pluralSys_link2" />
+					$0]]></replace>
+    </modification>
+    <modification template="account_wrapper" modification_key="addpluralsysextend" description="Add Plural system extend" execution_order="10" enabled="1" action="str_replace">
+      <find><![CDATA[<!-- slot: pre_conversations -->]]></find>
+      <replace><![CDATA[<xen:include template="account_wrapperExtend_pluralsys" />
+			$0]]></replace>
     </modification>
     <modification template="editor_js_setup" modification_key="addrelangbuttonjs" description="Add button label" execution_order="10" enabled="1" action="str_replace">
       <find><![CDATA[RELANG.xf = {]]></find>

@@ -1,6 +1,14 @@
 <?php
 
 class pluralSysMember_sharedStatic {
+	public static function debug($data){
+		die(print_r($data,true));
+	}
+	public static function startsWith($haystack, $needle)
+	{//http://stackoverflow.com/questions/834303/startswith-and-endswith-functions-in-php
+		 $length = strlen($needle);
+		 return (substr($haystack, 0, $length) === $needle);
+	}
     public static $hm2color = array();
     public static $colorPalete = array(0,
 									   120,
@@ -20,13 +28,19 @@ class pluralSysMember_sharedStatic {
 			return self::$hm2color[$hmn];
 		}
 		else{
-			$paletelen = count(self::$colorPalete);
-			self::$hm2color[$hmn]=self::$colorPalete[self::$colorPaleteState];
-			self::$colorPaleteState=(self::$colorPaleteState+1)%(($paletelen>0)?$paletelen:1);
+			$matches = array();
+			preg_match('/color\_hue=([0-9]+);(.*)/i',$hmn,$matches);
+			if(count($matches)==3){
+				self::$hm2color[$hmn] = intval($matches[1]);
+				self::$hm2color[$matches[2]] = intval($matches[1]);
+			}else{
+				$paletelen = count(self::$colorPalete);
+				self::$hm2color[$hmn]=self::$colorPalete[self::$colorPaleteState];
+				self::$colorPaleteState=(self::$colorPaleteState+1)%(($paletelen>0)?$paletelen:1);
+			}
 			return self::$hm2color[$hmn];
 		}
 	}
-    
 	public static function bbrenderCallback(array $tag, array $rendererStates, XenForo_BbCode_Formatter_Base $formatter)
     {
 		$inner = $formatter->renderTree($tag['children']);
@@ -37,7 +51,12 @@ class pluralSysMember_sharedStatic {
 			$inner = substr($inner,0,-6);
 		}
 		$hm = $tag['option'];
-		$rot = self::getColorForHeadmate($hm);
+		$rot = self::getColorForHeadmate($tag['option']);
+		$matches = array();
+		preg_match('/color\_hue=([0-9]+);(.*)/i',$hm,$matches);
+		if(count($matches)==3){
+			$hm = $matches[2];
+		}
 		$outerbef = '<div style="background-color:hsla('.(string)$rot.', 100%, 50%, 0.1);padding:5px;margin:5px;border:1px solid hsla('.(string)$rot.', 100%, 50%, 0.4);border-radius:5px;">';
 		$outeraft = '<br /><span style="'.
 					'display:block;'.
