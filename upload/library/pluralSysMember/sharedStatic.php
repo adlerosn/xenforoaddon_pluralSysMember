@@ -57,18 +57,26 @@ class pluralSysMember_sharedStatic {
 		if(count($matches)==3){
 			$hm = $matches[2];
 		}
-		$outerbef = '<div style="background-color:hsla('.(string)$rot.', 100%, 50%, 0.1);padding:5px;margin:5px;border:1px solid hsla('.(string)$rot.', 100%, 50%, 0.4);border-radius:5px;">';
-		$outeraft = '<br /><span style="'.
-					'display:block;'.
-					'float:right;'.
-					'background-color:hsla('.(string)$rot.', 100%, 95%, 0.3);'.
-					'padding:3px;'.
-					'margin:3px;'.
-					'border:1px solid hsla('.(string)$rot.', 100%, 80%, 0.5);'.
-					'border-radius:3px;'.
-					'color:hsl('.(string)$rot.', 100%, 15%);'.
-					'text-shadow:1px 1px 5px #FFFFFF,-1px 1px 5px #FFFFFF,1px -1px 5px #FFFFFF,-1px -1px 5px #FFFFFF;'.
-										'">&nbsp'.htmlspecialchars($hm).'&nbsp</span><span style="padding:3px;margin:3px;">&nbsp</span></div>';
+		$outerbef = '';
+		$outeraft = '';
+		if($formatter instanceof XenForo_BbCode_Formatter_Text){
+			$outerbef = '«'.$hm.' ‹ ';
+			$outeraft = '›»';
+		}
+		else{
+			$outerbef = '<div style="background-color:hsla('.(string)$rot.', 100%, 50%, 0.1);padding:5px;margin:5px;border:1px solid hsla('.(string)$rot.', 100%, 50%, 0.4);border-radius:5px;">';
+			$outeraft = '<br /><span style="'.
+						'display:block;'.
+						'float:right;'.
+						'background-color:hsla('.(string)$rot.', 100%, 95%, 0.3);'.
+						'padding:3px;'.
+						'margin:3px;'.
+						'border:1px solid hsla('.(string)$rot.', 100%, 80%, 0.5);'.
+						'border-radius:3px;'.
+						'color:hsl('.(string)$rot.', 100%, 15%);'.
+						'text-shadow:1px 1px 5px #FFFFFF,-1px 1px 5px #FFFFFF,1px -1px 5px #FFFFFF,-1px -1px 5px #FFFFFF;'.
+											'">&nbsp'.htmlspecialchars($hm).'&nbsp</span><span style="padding:3px;margin:3px;">&nbsp</span></div>';
+		}
 		return $outerbef.$inner.$outeraft;
 	}
 }

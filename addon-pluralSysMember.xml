@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="pluralSysMember" title="[kiror] Plural System Member bbCode" version_string="0.2" version_id="2" url="https://github.com/adlerosn/" install_callback_class="pluralSysMember_Install" install_callback_method="install" uninstall_callback_class="pluralSysMember_Install" uninstall_callback_method="uninstall">
+<addon addon_id="pluralSysMember" title="[kiror][BBCode] Plural System" version_string="0.2" version_id="2" url="https://github.com/adlerosn/" install_callback_class="pluralSysMember_Install" install_callback_method="install" uninstall_callback_class="pluralSysMember_Install" uninstall_callback_method="uninstall">
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
